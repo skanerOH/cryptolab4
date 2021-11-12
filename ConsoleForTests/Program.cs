@@ -2,24 +2,53 @@
 using System;
 using System.Numerics;
 using System.Text;
+using System.Diagnostics;
 
 namespace ConsoleForTests
 {
     class Program
     {
+        static string TestWithKeyL(byte[] input, int keyLength)
+        {
+            Stopwatch st = new Stopwatch();
+
+            RSA.keyLength = keyLength;
+
+            (Key publicKey, Key privateKey) = RSA.GenerateRSAPair();
+
+            st.Start();
+
+            for (int i = 0; i < 5; ++i)
+            {
+                byte[] chipher = RSA.EncryptRSA(input, privateKey);
+
+                byte[] plain = RSA.DecryptRSA(chipher, publicKey);
+            }
+
+            st.Stop();
+
+            return $"Processed with key length={keyLength} for {st.ElapsedMilliseconds}ms";
+        }
+
+
         static void Main(string[] args)
         {
             byte[] inp = Encoding.ASCII.GetBytes("Hello form Donbass children!!!");
 
-            (Key publicKey, Key privateKey) = RSA.GenerateRSAPair();
+            TestWithKeyL(inp, 1024);
 
-            byte[] oaeped_plain = OAEP.TransformOAEP(inp, "SHA-256 MGF1", 10);
-            byte[] chipher = RSA.EncryptRSA(oaeped_plain, privateKey);
+            Console.WriteLine(TestWithKeyL(inp, 128));
+            Console.WriteLine(TestWithKeyL(inp, 256));
+            Console.WriteLine(TestWithKeyL(inp, 512));
+            Console.WriteLine(TestWithKeyL(inp, 1024));
 
-            byte[] plain = OAEP.RestoreOAEP(RSA.DecryptRSA(chipher, publicKey), "SHA-256 MGF1");
+            //(Key publicKey, Key privateKey) = RSA.GenerateRSAPair();
 
-            Console.WriteLine(Encoding.ASCII.GetString(plain));
+            //byte[] chipher = RSA.EncryptRSA(inp, privateKey);
 
+            //byte[] plain = RSA.DecryptRSA(chipher, publicKey);
+
+            //Console.WriteLine("asdasd");
 
             Console.ReadKey();
         }

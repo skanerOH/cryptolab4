@@ -14,7 +14,7 @@ namespace crypto_lab_4
 
 	public class RSA
     {
-		private static int keyLength = 1024;
+		public static int keyLength = 1024;
 
 		private static BigInteger GenerateRandomPrime()
 		{
